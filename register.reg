@@ -1,0 +1,17 @@
+Windows Registry Editor Version 5.00
+
+; ── COM InprocServer32 ──────────────────────────────────────────────────────
+; Update the DLL path if you install to a different location.
+
+[HKEY_CLASSES_ROOT\CLSID\{B5A84CD4-1F6A-4A52-9A11-D90E6C9D9C4A}]
+@="ResetPasswordCredentialProvider"
+
+[HKEY_CLASSES_ROOT\CLSID\{B5A84CD4-1F6A-4A52-9A11-D90E6C9D9C4A}\InprocServer32]
+@="C:\\Windows\\System32\\ResetPasswordCP.dll"
+"ThreadingModel"="Apartment"
+
+; ── Credential Provider registration ───────────────────────────────────────
+; This key is what makes the tile appear on the logon / lock screen.
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers\{B5A84CD4-1F6A-4A52-9A11-D90E6C9D9C4A}]
+@="ResetPasswordCredentialProvider"

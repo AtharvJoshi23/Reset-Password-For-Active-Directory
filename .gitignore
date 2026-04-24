@@ -1,0 +1,22 @@
+# Sensitive files — never commit
+backend-dotnet/.env
+*.pfx
+*.pdb
+
+# Build output
+x64/
+backend-dotnet/bin/
+backend-dotnet/obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.tlog
+*.obj
+*.exp
+*.lib
+*.iobj
+*.ipdb
+*.recipe
+*.log
