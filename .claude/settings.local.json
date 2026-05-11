@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell.exe -Command \"Get-ChildItem 'C:\\\\ResetPasswordAPI' -Recurse | Select-Object FullName\")",
+      "Bash(powershell.exe -Command \"Get-ChildItem 'C:\\\\ResetPasswordAPI' | Select-Object Name, LastWriteTime\")",
+      "Bash(powershell.exe -Command \"Get-ChildItem 'C:\\\\' | Select-Object Name\")",
+      "Bash(powershell.exe -Command \"Get-ChildItem 'C:\\\\Scripts' | Select-Object Name\")",
+      "Bash(powershell.exe -Command \"Get-ScheduledTask -TaskName 'ResetPasswordAPI' -ErrorAction SilentlyContinue | Select-Object TaskName, State\")",
+      "Bash(powershell.exe -Command 'Get-ScheduledTask | Where-Object { $_.TaskName -like '\\\\''*Reset*'\\\\'' -or $_.TaskName -like '\\\\''*Password*'\\\\'' -or $_.TaskName -like '\\\\''*API*'\\\\'' } | Select-Object TaskName, State, TaskPath')",
+      "Bash(powershell.exe -Command \"Get-Process node -ErrorAction SilentlyContinue | Select-Object Id, CPU, Path, StartTime\")",
+      "Bash(powershell.exe -Command \"Get-ChildItem 'D:\\\\reset password\\\\backend' | Select-Object Name\")",
+      "Bash(powershell.exe -Command \"Get-ChildItem 'D:\\\\reset password\\\\backend\\\\services' | Select-Object Name\")",
+      "Bash(powershell.exe -Command 'Get-ChildItem '\\\\''D:\\\\reset password'\\\\'' -Recurse | Where-Object { -not $_.PSIsContainer } | Select-Object FullName')"
+    ]
+  }
+}

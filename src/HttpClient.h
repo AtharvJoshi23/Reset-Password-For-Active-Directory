@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#pragma comment(lib, "winhttp.lib")
+
 struct HttpResult
 {
     DWORD        statusCode;
@@ -50,6 +52,116 @@ static inline std::wstring JsonExtractString(const std::wstring& json, const wch
     if (end == std::wstring::npos) return L"";
     return json.substr(pos, end - pos);
 }
+
+// ─────────────────────────────────────────────
+// Health Check (VPN / Network Detection)
+// ─────────────────────────────────────────────
+inline bool IsApiReachable()
+{
+    HINTERNET hSession = WinHttpOpen(
+        L"ResetPasswordClient/1.0",
+        WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
+        WINHTTP_NO_PROXY_NAME,
+        WINHTTP_NO_PROXY_BYPASS,
+        0);
+
+    if (!hSession)
+        return false;
+
+    // 🔥 IMPORTANT: Prevent UI freeze
+    WinHttpSetTimeouts(hSession, 2000, 2000, 2000, 2000);
+
+    HINTERNET hConnect = WinHttpConnect(
+        hSession,
+        L"172.16.30.23",
+        8443,
+        0);
+
+    if (!hConnect)
+    {
+        WinHttpCloseHandle(hSession);
+        return false;
+    }
+
+    HINTERNET hRequest = WinHttpOpenRequest(
+        hConnect,
+        L"GET",
+        L"/health",
+        NULL,
+        WINHTTP_NO_REFERER,
+        WINHTTP_DEFAULT_ACCEPT_TYPES,
+        WINHTTP_FLAG_SECURE);
+
+    if (!hRequest)
+    {
+        WinHttpCloseHandle(hConnect);
+        WinHttpCloseHandle(hSession);
+        return false;
+    }
+
+    // For internal/self-signed cert
+    DWORD dwFlags =
+        SECURITY_FLAG_IGNORE_UNKNOWN_CA |
+        SECURITY_FLAG_IGNORE_CERT_DATE_INVALID |
+        SECURITY_FLAG_IGNORE_CERT_CN_INVALID;
+
+    WinHttpSetOption(
+        hRequest,
+        WINHTTP_OPTION_SECURITY_FLAGS,
+        &dwFlags,
+        sizeof(dwFlags));
+
+    BOOL bResult = WinHttpSendRequest(
+        hRequest,
+        WINHTTP_NO_ADDITIONAL_HEADERS,
+        0,
+        WINHTTP_NO_REQUEST_DATA,
+        0,
+        0,
+        0);
+
+    if (!bResult)
+    {
+        WinHttpCloseHandle(hRequest);
+        WinHttpCloseHandle(hConnect);
+        WinHttpCloseHandle(hSession);
+        return false;
+    }
+
+    bResult = WinHttpReceiveResponse(hRequest, NULL);
+
+    if (!bResult)
+    {
+        WinHttpCloseHandle(hRequest);
+        WinHttpCloseHandle(hConnect);
+        WinHttpCloseHandle(hSession);
+        return false;
+    }
+
+    DWORD statusCode = 0;
+    DWORD size = sizeof(statusCode);
+
+    if (!WinHttpQueryHeaders(
+        hRequest,
+        WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER,
+        WINHTTP_HEADER_NAME_BY_INDEX,
+        &statusCode,
+        &size,
+        WINHTTP_NO_HEADER_INDEX))
+    {
+        WinHttpCloseHandle(hRequest);
+        WinHttpCloseHandle(hConnect);
+        WinHttpCloseHandle(hSession);
+        return false;
+    }
+
+    WinHttpCloseHandle(hRequest);
+    WinHttpCloseHandle(hConnect);
+    WinHttpCloseHandle(hSession);
+
+    return (statusCode == 200);
+}
+
 
 // Sends an HTTP POST with a JSON body over TLS. Synchronous, blocks up to timeoutMs.
 static inline HttpResult HttpPostJson(

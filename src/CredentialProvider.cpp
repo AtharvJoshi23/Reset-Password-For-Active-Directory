@@ -53,11 +53,14 @@ ULONG CCredentialProvider::Release()
 HRESULT CCredentialProvider::SetUsageScenario(
     CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus, DWORD /*dwFlags*/)
 {
-    // Hide tile if machine is not joined to the viz.in domain
+    // Hide tile only when the machine domain is known and not viz.in.
+    // If lookup fails (for example transient/offline conditions), keep the
+    // tile visible so users can still use the Connect VPN action.
     wchar_t domain[256] = {};
     DWORD   domainSize  = ARRAYSIZE(domain);
-    if (!GetComputerNameExW(ComputerNameDnsDomain, domain, &domainSize) ||
-        _wcsicmp(domain, L"viz.in") != 0)
+    if (GetComputerNameExW(ComputerNameDnsDomain, domain, &domainSize) &&
+        domain[0] != L'\0' &&
+        _wcsicmp(domain, L"int.viz") != 0)
     {
         return E_NOTIMPL;
     }

@@ -3,6 +3,7 @@
 #include <objbase.h>
 #include <credentialprovider.h>
 #include <strsafe.h>
+#include <shellapi.h>
 #include <new>
 
 // {B5A84CD4-1F6A-4A52-9A11-D90E6C9D9C4A}
@@ -12,19 +13,27 @@ EXTERN_C const CLSID CLSID_ResetPasswordCP;
 enum FIELD_ID : DWORD
 {
     FI_TITLE        = 0,   // CPFT_LARGE_TEXT     — tile header
-    FI_USERNAME     = 1,   // CPFT_EDIT_TEXT       — plain text
+    FI_USERNAME     = 1,   // CPFT_EDIT_TEXT       — AD username
     FI_SEND_OTP     = 2,   // CPFT_COMMAND_LINK    — fires CommandLinkClicked
     FI_OTP          = 3,   // CPFT_PASSWORD_TEXT   — masked
     FI_NEW_PASSWORD = 4,   // CPFT_PASSWORD_TEXT   — masked
     FI_STATUS       = 5,   // CPFT_SMALL_TEXT      — live status / error display
-    FI_SUBMIT       = 6,   // CPFT_SUBMIT_BUTTON   — fires GetSerialization
-    FI_COUNT        = 7
+    FI_CONNECT_VPN  = 6,   // CPFT_COMMAND_LINK    — launches NEGui
+    FI_SUBMIT       = 7,   // CPFT_SUBMIT_BUTTON   — fires GetSerialization
+    FI_COUNT        = 8
 };
 
-// Declared here, defined once in Credential.cpp
-extern const CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR g_FieldDescriptors[FI_COUNT];
+// VPN / network state machine.
+enum VpnState : LONG
+{
+    STATE_INIT           = 0,
+    STATE_NO_NETWORK     = 1,
+    STATE_CONNECTING_VPN = 2,
+    STATE_CONNECTED      = 3,
+    STATE_OTP_FLOW       = 4,
+};
 
-// Reference count for DllCanUnloadNow — defined in dllmain.cpp
+extern const CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR g_FieldDescriptors[FI_COUNT];
 extern LONG g_cRef;
 
 class CCredential : public ICredentialProviderCredential
@@ -33,12 +42,10 @@ public:
     CCredential();
     ~CCredential();
 
-    // IUnknown
     IFACEMETHODIMP         QueryInterface(REFIID riid, void** ppv);
     IFACEMETHODIMP_(ULONG) AddRef();
     IFACEMETHODIMP_(ULONG) Release();
 
-    // ICredentialProviderCredential
     IFACEMETHODIMP Advise(ICredentialProviderCredentialEvents* pcpce);
     IFACEMETHODIMP UnAdvise();
     IFACEMETHODIMP SetSelected(BOOL* pbAutoLogonWithDefault);
@@ -75,5 +82,13 @@ private:
     wchar_t _szNewPassword[256];
     wchar_t _szStatus     [512];
 
+    volatile LONG _state;
+    HANDLE        _hMonitorThread;
+    volatile LONG _bMonitorRunning;
+
     void _UpdateStatus(const wchar_t* msg);
+    void _EnableOtpFields(bool enable);
+    void _ApplyState();
+    void _StartMonitorThread();
+    static DWORD WINAPI _MonitorThreadProc(LPVOID pv);
 };

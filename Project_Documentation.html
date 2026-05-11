@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AD Password Reset – Complete Technical Documentation</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: #1a1a2e;
+    background: #fff;
+  }
+
+  /* ── Cover Page ── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #0f3460 0%, #16213e 60%, #1a1a2e 100%);
+    color: #fff;
+    text-align: center;
+    padding: 60px 40px;
+    page-break-after: always;
+  }
+  .cover .badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 30px;
+    padding: 6px 22px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    color: #a8d8ea;
+  }
+  .cover h1 {
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 14px;
+    line-height: 1.2;
+  }
+  .cover h1 span { color: #e94560; }
+  .cover .subtitle {
+    font-size: 16px;
+    color: #a8d8ea;
+    max-width: 520px;
+    margin: 0 auto 48px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 48px;
+  }
+  .cover-meta div { text-align: center; }
+  .cover-meta .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #a8d8ea; margin-bottom: 4px; }
+  .cover-meta .value { font-size: 14px; font-weight: 600; }
+  .cover-divider {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #e94560, #0f3460);
+    border-radius: 2px;
+    margin: 32px auto;
+  }
+
+  /* ── TOC ── */
+  .toc-page {
+    padding: 60px 80px;
+    page-break-after: always;
+  }
+  .toc-page h2 { font-size: 22px; font-weight: 700; margin-bottom: 28px; color: #0f3460; }
+  .toc-list { list-style: none; counter-reset: toc-counter; }
+  .toc-list > li {
+    counter-increment: toc-counter;
+    border-bottom: 1px dotted #d0d7e2;
+    padding: 8px 0;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .toc-list > li::before {
+    content: counter(toc-counter);
+    min-width: 26px;
+    font-weight: 700;
+    color: #e94560;
+    font-size: 13px;
+  }
+  .toc-list .toc-title { flex: 1; font-size: 13.5px; font-weight: 600; color: #1a1a2e; }
+  .toc-list .toc-dots { flex: 1; border-bottom: 1px dotted #ccc; margin: 0 8px; }
+  .toc-list .toc-pg { font-size: 12px; color: #666; min-width: 16px; text-align: right; }
+  .toc-sub { list-style: none; margin-left: 28px; margin-top: 4px; }
+  .toc-sub li { font-size: 12.5px; color: #444; padding: 3px 0; }
+
+  /* ── Page layout ── */
+  .page {
+    padding: 52px 72px;
+    page-break-after: always;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  /* ── Section headings ── */
+  .section-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #e94560;
+    margin-bottom: 6px;
+  }
+  h2.section-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f3460;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e8eaf6;
+  }
+  h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #16213e;
+    margin-top: 28px;
+    margin-bottom: 10px;
+  }
+  h4 {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #0f3460;
+    margin-top: 18px;
+    margin-bottom: 6px;
+  }
+
+  /* ── Body text ── */
+  p { margin-bottom: 12px; color: #2d2d2d; }
+  ul, ol { margin: 8px 0 12px 20px; }
+  li { margin-bottom: 4px; }
+  strong { color: #0f3460; }
+
+  /* ── Info box ── */
+  .info-box {
+    background: #f0f4ff;
+    border-left: 4px solid #0f3460;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .info-box.warning {
+    background: #fff8e1;
+    border-left-color: #f59e0b;
+  }
+  .info-box.success {
+    background: #f0fff4;
+    border-left-color: #10b981;
+  }
+  .info-box.danger {
+    background: #fff0f0;
+    border-left-color: #e94560;
+  }
+  .info-box-title {
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    color: #0f3460;
+  }
+  .info-box.warning .info-box-title { color: #b45309; }
+  .info-box.success .info-box-title { color: #065f46; }
+  .info-box.danger  .info-box-title { color: #be123c; }
+
+  /* ── Code ── */
+  pre {
+    background: #1a1a2e;
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-size: 12px;
+    line-height: 1.6;
+    margin: 12px 0 18px;
+    font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+  }
+  code {
+    background: #f0f4ff;
+    color: #0f3460;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+  }
+  pre code { background: none; color: inherit; padding: 0; }
+  .comment { color: #6b7280; }
+  .keyword { color: #93c5fd; }
+  .string  { color: #86efac; }
+  .func    { color: #fde68a; }
+  .type    { color: #c4b5fd; }
+  .num     { color: #fb923c; }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0 20px;
+    font-size: 13px;
+  }
+  th {
+    background: #0f3460;
+    color: #fff;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #e8eaf6;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #f8f9ff; }
+  tr:hover td { background: #f0f4ff; }
+
+  /* ── Flow diagram ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    margin: 16px 0;
+  }
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .flow-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .flow-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #0f3460;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .flow-line {
+    width: 2px;
+    flex: 1;
+    min-height: 20px;
+    background: #dbe2f0;
+    margin: 4px 0;
+  }
+  .flow-content {
+    padding: 4px 0 20px;
+  }
+  .flow-content strong { color: #0f3460; font-size: 14px; display: block; margin-bottom: 3px; }
+  .flow-content p { margin: 0; font-size: 12.5px; color: #555; }
+
+  /* ── Architecture box ── */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .arch-card {
+    border: 1.5px solid #dbe2f0;
+    border-radius: 10px;
+    padding: 18px;
+  }
+  .arch-card-title {
+    font-weight: 700;
+    font-size: 13px;
+    color: #0f3460;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .arch-card-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #0f3460;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .arch-card ul { margin-left: 16px; font-size: 12.5px; }
+  .arch-card li { margin-bottom: 3px; }
+
+  /* ── State machine ── */
+  .state-machine {
+    background: #f8f9ff;
+    border: 1.5px solid #dbe2f0;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 14px 0;
+    font-size: 12.5px;
+  }
+  .state-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+  }
+  .state-badge {
+    background: #0f3460;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .state-badge.connected { background: #059669; }
+  .state-badge.no-net    { background: #dc2626; }
+  .state-badge.vpn       { background: #d97706; }
+  .state-badge.otp       { background: #7c3aed; }
+  .state-arrow { color: #666; font-size: 16px; }
+  .state-desc  { color: #444; }
+
+  /* ── API endpoint ── */
+  .endpoint {
+    border: 1.5px solid #dbe2f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+  .endpoint-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #f0f4ff;
+    border-bottom: 1px solid #dbe2f0;
+  }
+  .method {
+    font-weight: 700;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: #0f3460;
+    color: #fff;
+    letter-spacing: 0.5px;
+  }
+  .method.get  { background: #059669; }
+  .method.post { background: #0f3460; }
+  .endpoint-path { font-family: monospace; font-weight: 700; font-size: 13.5px; color: #1a1a2e; }
+  .endpoint-desc { color: #555; font-size: 12.5px; margin-left: auto; }
+  .endpoint-body { padding: 14px 16px; font-size: 12.5px; }
+
+  /* ── Field table ── */
+  .field-badge {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #e8eaf6;
+    color: #3730a3;
+  }
+
+  /* ── Page header ── */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e8eaf6;
+    font-size: 11px;
+    color: #999;
+  }
+  .page-header .project { font-weight: 600; color: #0f3460; }
+
+  @media print {
+    .cover    { page-break-after: always; }
+    .toc-page { page-break-after: always; }
+    .page     { page-break-after: always; }
+    pre { white-space: pre-wrap; word-break: break-word; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <div class="badge">Technical Reference &amp; Developer Guide</div>
+  <h1>AD Password Reset<br><span>Credential Provider</span></h1>
+  <p class="subtitle">
+    A self-service Windows login-screen tile that lets domain users reset their
+    Active Directory password using OTP-verified email — no IT helpdesk required.
+  </p>
+  <div class="cover-divider"></div>
+  <div class="cover-meta">
+    <div><div class="label">Version</div><div class="value">1.0.0</div></div>
+    <div><div class="label">Platform</div><div class="value">Windows / AD</div></div>
+    <div><div class="label">Domain</div><div class="value">viz.in</div></div>
+    <div><div class="label">Server IP</div><div class="value">172.16.10.4</div></div>
+    <div><div class="label">Date</div><div class="value">May 2026</div></div>
+  </div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc-page">
+  <h2>Table of Contents</h2>
+  <ul class="toc-list">
+    <li>
+      <span class="toc-title">Project Overview</span>
+      <span class="toc-dots"></span><span class="toc-pg">3</span>
+    </li>
+    <li>
+      <span class="toc-title">System Architecture</span>
+      <span class="toc-dots"></span><span class="toc-pg">4</span>
+      <ul class="toc-sub"><li>Component diagram &amp; data flow</li><li>Technology stack</li></ul>
+    </li>
+    <li>
+      <span class="toc-title">Backend API (ASP.NET Core 8)</span>
+      <span class="toc-dots"></span><span class="toc-pg">5</span>
+      <ul class="toc-sub"><li>Endpoints: /health, /api/auth/request-otp, /api/auth/reset-password</li><li>OTP engine, LDAP integration, email, rate limiting</li></ul>
+    </li>
+    <li>
+      <span class="toc-title">Credential Provider DLL (C++)</span>
+      <span class="toc-dots"></span><span class="toc-pg">7</span>
+      <ul class="toc-sub"><li>COM architecture, CLSID, domain guard</li><li>UI fields, VPN state machine, background monitor thread</li><li>HTTP client (WinHTTP), secure memory handling</li></ul>
+    </li>
+    <li>
+      <span class="toc-title">How It Was Built — Step-by-Step</span>
+      <span class="toc-dots"></span><span class="toc-pg">10</span>
+      <ul class="toc-sub"><li>Prerequisites, building DLL, building backend, TLS certificate</li></ul>
+    </li>
+    <li>
+      <span class="toc-title">Configuration Reference</span>
+      <span class="toc-dots"></span><span class="toc-pg">12</span>
+    </li>
+    <li>
+      <span class="toc-title">Deployment Guide</span>
+      <span class="toc-dots"></span><span class="toc-pg">13</span>
+      <ul class="toc-sub"><li>Backend as Windows Service</li><li>Credential provider via GPO auto-deploy</li></ul>
+    </li>
+    <li>
+      <span class="toc-title">End-User Flow</span>
+      <span class="toc-dots"></span><span class="toc-pg">15</span>
+    </li>
+    <li>
+      <span class="toc-title">Security Design</span>
+      <span class="toc-dots"></span><span class="toc-pg">16</span>
+    </li>
+    <li>
+      <span class="toc-title">Troubleshooting</span>
+      <span class="toc-dots"></span><span class="toc-pg">17</span>
+    </li>
+  </ul>
+</div>
+
+<!-- SECTION 1: PROJECT OVERVIEW -->
+<div class="page">
+  <div class="page-header">
+    <span class="project">AD Password Reset – Credential Provider</span>
+    <span>Section 1 &middot; Project Overview</span>
+  </div>
+  <div class="section-label">Section 1</div>
+  <h2 class="section-title">Project Overview</h2>
+
+  <p>
+    The <strong>AD Password Reset Credential Provider</strong> is a self-service password reset
+    solution for Windows domain environments. It adds a custom tile directly to the
+    <strong>Windows login / lock screen</strong> so that users can reset their own Active Directory
+    password without calling IT support — even before they have logged in.
+  </p>
+
+  <h3>Problem It Solves</h3>
+  <p>
+    In a standard Active Directory environment, a user who forgets their password must call the
+    IT helpdesk, wait for an admin to reset it manually, and then log in. This process is slow,
+    expensive, and disruptive. This project automates the entire flow securely via email OTP.
+  </p>
+
+  <h3>What the User Sees</h3>
+  <p>
+    On the Windows lock screen or login screen, the user sees an extra tile labelled
+    <strong>"Reset AD Password"</strong>. Clicking it opens a form with fields for their AD
+    username and a one-time password. After verifying identity via OTP sent to their registered
+    email, they can set a new password immediately.
+  </p>
+
+  <h3>High-Level Flow</h3>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">1</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>User clicks "Reset AD Password" tile</strong>
+        <p>The tile appears on every domain-joined machine (viz.in domain) at the login or lock screen.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">2</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Credential Provider checks network connectivity</strong>
+        <p>It calls the backend health endpoint. If unreachable, it shows "Connect VPN" to launch SonicWall NetExtender.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">3</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>User enters AD username and clicks "Send OTP"</strong>
+        <p>The backend validates the user exists in Active Directory and sends a 6-digit OTP to their registered email.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">4</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>User enters OTP + new password and clicks "Reset Password"</strong>
+        <p>The backend verifies the OTP, then resets the AD password via LDAP. The OTP is consumed and cannot be reused.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">5</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Success — log in immediately with new password</strong>
+        <p>Status shows "Password reset successful." The user can now log in with the Windows password tile.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Two Components</h3>
+  <div class="arch-grid">
+    <div class="arch-card">
+      <div class="arch-card-title">
+        <div class="arch-card-icon">&#128187;</div>
+        Credential Provider DLL (C++)
+      </div>
+      <ul>
+        <li>Runs inside Windows LogonUI process</li>
+        <li>Renders the login tile and all UI fields</li>
+        <li>Handles VPN detection and connection</li>
+        <li>Communicates with backend over HTTPS</li>
+        <li>File: <code>ResetPasswordCP.dll</code></li>
+      </ul>
+    </div>
+    <div class="arch-card">
+      <div class="arch-card-title">
+        <div class="arch-card-icon">&#9881;</div>
+        Backend API (ASP.NET Core 8)
+      </div>
+      <ul>
+        <li>Runs as a Windows Service on the server</li>
+        <li>Exposes HTTPS REST API on port 8443</li>
+        <li>Manages OTP generation, email, AD password reset</li>
+        <li>Connects to Active Directory via LDAP over SSL</li>
+        <li>File: <code>ResetPasswordAPI.exe</code></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: ARCHITECTURE -->
+<div class="page">
+  <div class="page-header">
+    <span class="project">AD Password Reset – Credential Provider</span>
+    <span>Section 2 &middot; System Architecture</span>
+  </div>
+  <div class="section-label">Section 2</div>
+  <h2 class="section-title">System Architecture</h2>
+
+  <h3>Component Diagram</h3>
+  <pre>
+  +-------------------------------------------------------------------------+
+  |                        CLIENT MACHINE (Domain PC)                       |
+  |                                                                         |
+  |   +------------------------------------------------------------------+  |
+  |   |  Windows LogonUI Process                                         |  |
+  |   |                                                                  |  |
+  |   |   +----------------------------------+                           |  |
+  |   |   |   ResetPasswordCP.dll            |                           |  |
+  |   |   |   (Credential Provider)          |                           |  |
+  |   |   |                                  |                           |  |
+  |   |   |  CCredentialProvider (COM obj)   |                           |  |
+  |   |   |  CCredential (UI + logic)        |                           |  |
+  |   |   |  HttpClient (WinHTTP / TLS)      |---- HTTPS :8443 ------&gt;  |  |
+  |   |   |  VPN Monitor Thread              |                           |  |
+  |   |   +----------------------------------+                           |  |
+  |   +------------------------------------------------------------------+  |
+  |                                                                         |
+  |   SonicWall NetExtender (NEGui.exe)  &lt;-- launched by Connect VPN btn   |
+  +-------------------------------------------------------------------------+
+                        |  HTTPS over VPN (port 8443)
+                        v
+  +-------------------------------------------------------------------------+
+  |              SERVER  172.16.10.4  (Domain Controller / Member Server)   |
+  |                                                                         |
+  |   +----------------------------------+   +---------------------------+  |
+  |   |   ResetPasswordAPI.exe           |   |   Active Directory        |  |
+  |   |   (ASP.NET Core 8 Windows Svc)   |   |                           |  |
+  |   |                                  |   |   LDAPS port 636          |  |
+  |   |   Port: 8443 (HTTPS/TLS)         |--&gt;|   - User lookup           |  |
+  |   |   /health                        |   |   - Password reset        |  |
+  |   |   /api/auth/request-otp          |   |     (unicodePwd)          |  |
+  |   |   /api/auth/reset-password       |   +---------------------------+  |
+  |   |                                  |                                  |
+  |   |   In-memory OTP store            |   +---------------------------+  |
+  |   |   Rate limiter (10 / 15 min)     |--&gt;|   SMTP Server             |  |
+  |   +----------------------------------+   |   (OTP email delivery)    |  |
+  |                                          +---------------------------+  |
+  +-------------------------------------------------------------------------+</pre>
+
+  <h3>Technology Stack</h3>
+  <table>
+    <thead><tr><th>Layer</th><th>Technology</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>UI / Login Tile</td><td>C++ Win32, COM, ICredentialProvider v1</td><td>Only supported way to add a custom tile to the Windows login/lock screen</td></tr>
+      <tr><td>HTTP Communication</td><td>WinHTTP (Windows built-in)</td><td>No external dependencies in the DLL; available on all Windows versions</td></tr>
+      <tr><td>Backend API</td><td>ASP.NET Core 8 Minimal API</td><td>Lightweight, runs as a Windows Service, built-in Kestrel HTTPS server</td></tr>
+      <tr><td>Directory Service</td><td>LDAP over SSL (port 636), System.DirectoryServices.Protocols</td><td>Secure standard protocol to query and modify Active Directory</td></tr>
+      <tr><td>OTP Generation</td><td>System.Security.Cryptography.RandomNumberGenerator</td><td>Cryptographically secure random number generation</td></tr>
+      <tr><td>Email</td><td>System.Net.Mail.SmtpClient</td><td>Built-in .NET SMTP client, no extra dependencies</td></tr>
+      <tr><td>VPN Client</td><td>SonicWall NetExtender (NEGui.exe)</td><td>Organisation's existing SSL VPN solution</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Network Ports Required</h3>
+  <table>
+    <thead><tr><th>Port</th><th>Protocol</th><th>Direction</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><strong>8443</strong></td><td>HTTPS/TLS</td><td>Client to Server</td><td>Credential Provider DLL to Backend API</td></tr>
+      <tr><td><strong>636</strong></td><td>LDAPS</td><td>Server internal</td><td>Backend API to Active Directory</td></tr>
+      <tr><td><strong>587 / 465</strong></td><td>SMTP/TLS</td><td>Server to Mail</td><td>OTP email delivery</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 3: BACKEND API -->
+<div class="page">
+  <div class="page-header">
+    <span class="project">AD Password Reset – Credential Provider</span>
+    <span>Section 3 &middot; Backend API</span>
+  </div>
+  <div class="section-label">Section 3</div>
+  <h2 class="section-title">Backend API (ASP.NET Core 8)</h2>
+
+  <p>
+    The backend is a single-file ASP.NET Core 8 <strong>Minimal API</strong> written in C#.
+    It runs as a Windows Service on the domain controller at <code>172.16.10.4:8443</code>.
+    All traffic is HTTPS-only — no plain HTTP fallback.
+  </p>
+
+  <h3>File: <code>backend-dotnet/Program.cs</code></h3>
+  <p>The entire backend is one file, structured in this order:</p>
+  <ol>
+    <li><strong>.env file loader</strong> — reads configuration from a <code>.env</code> file next to the exe</li>
+    <li><strong>OTP store</strong> — in-memory dictionary of pending OTP codes</li>
+    <li><strong>LDAP helpers</strong> — user lookup and password reset functions</li>
+    <li><strong>Email helper</strong> — sends OTP email via SMTP</li>
+    <li><strong>App builder</strong> — configures Kestrel, rate limiter, logging</li>
+    <li><strong>Route handlers</strong> — the three HTTP endpoints</li>
+  </ol>
+
+  <h3>API Endpoints</h3>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/health</span>
+      <span class="endpoint-desc">Network reachability check</span>
+    </div>
+    <div class="endpoint-body">
+      <p>Called by the credential provider DLL every 5 seconds to check if the server is reachable.
+      Returns <code>200 OK</code>. No authentication required.</p>
+      <p><strong>Response (200):</strong></p>
+      <pre><code>{ "status": "ok", "time": "2026-05-11T06:30:00.000Z" }</code></pre>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method post">POST</span>
+      <span class="endpoint-path">/api/auth/request-otp</span>
+      <span class="endpoint-desc">Request a one-time password</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Request body:</strong></p>
+      <pre><code>{ "username": "john.doe" }</code></pre>
+      <p><strong>What it does:</strong></p>
+      <ol>
+        <li>Validates that username is present</li>
+        <li>Searches Active Directory for a user with that <code>sAMAccountName</code> who is not disabled</li>
+        <li>If not found, returns 404 "User not found or account disabled"</li>
+        <li>Generates a cryptographically random 6-digit OTP, stores it with an expiry timestamp</li>
+        <li>Sends the OTP to the user's AD-registered email address (the <code>mail</code> attribute)</li>
+      </ol>
+      <table>
+        <thead><tr><th>Status Code</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>200</td><td>OTP sent to email successfully</td></tr>
+          <tr><td>400</td><td>Username missing from request</td></tr>
+          <tr><td>404</td><td>User not found in AD or account is disabled</td></tr>
+          <tr><td>429</td><td>Rate limit hit (max 10 attempts per 15 minutes)</td></tr>
+          <tr><td>500</td><td>AD connection error or SMTP error</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint">
+    <div class="endpoint-header">
+      <span class="method post">POST</span>
+      <span class="endpoint-path">/api/auth/reset-password</span>
+      <span class="endpoint-desc">Verify OTP and set new password</span>
+    </div>
+    <div class="endpoint-body">
+      <p><strong>Request body:</strong></p>
+      <pre><code>{ "username": "john.doe", "otp": "482931", "newPassword": "MyNewPass@2026!" }</code></pre>
+      <p><strong>What it does:</strong></p>
+      <ol>
+        <li>Validates all three fields are present; validates new password is at least 12 characters</li>
+        <li>Verifies OTP matches the stored code and has not expired (one-time use — consumed on first use)</li>
+        <li>Looks up the user's Distinguished Name (DN) in Active Directory</li>
+        <li>Resets the password by writing to the <code>unicodePwd</code> LDAP attribute</li>
+      </ol>
+      <table>
+        <thead><tr><th>Status Code</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>200</td><td>Password reset successfully</td></tr>
+          <tr><td>400</td><td>Missing fields, password too short, or AD password policy rejected</td></tr>
+          <tr><td>401</td><td>OTP invalid or expired</td></tr>
+          <tr><td>404</td><td>User not found in AD</td></tr>
+          <tr><td>429</td><td>Rate limit exceeded</td></tr>
+          <tr><td>500</td><td>AD connection error</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h3>OTP Engine</h3>
+  <p>OTPs are stored in a <code>ConcurrentDictionary&lt;string, (string Code, DateTime Expiry)&gt;</code> keyed by lowercase username.</p>
+  <ul>
+    <li><strong>6-digit numeric code</strong> — generated via <code>RandomNumberGenerator.GetInt32(100000, 1000000)</code> (cryptographically secure)</li>
+    <li><strong>Configurable TTL</strong> — default 5 minutes (<code>OTP_TTL_SECONDS=300</code>)</li>
+    <li><strong>One-time use</strong> — consumed and deleted from the store immediately on validation</li>
+    <li><strong>Automatic expiry</strong> — checked on each validation attempt; expired entries are removed</li>
+    <li><strong>Case-insensitive</strong> — username is lowercased before use as the dictionary key</li>
+  </ul>
+
+  <h3>LDAP / Active Directory Integration</h3>
+  <p>Two LDAP operations are performed, both over LDAP-SSL (port 636):</p>
+  <p><strong>User Lookup</strong> — LDAP search filter used:</p>
+  <pre><code>(&amp;(objectClass=user)(sAMAccountName=&lt;username&gt;)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))</code></pre>
+  <p>The <code>userAccountControl</code> bit-mask check ensures disabled accounts are excluded. Retrieves the <code>mail</code> and <code>displayName</code> attributes.</p>
+  <p><strong>Password Reset</strong> — modifies the <code>unicodePwd</code> attribute with the new password encoded as UTF-16LE wrapped in quotes. This is the standard and only supported method for programmatic AD password resets. It requires LDAPS (SSL).</p>
+
+  <h3>Rate Limiting</h3>
+  <p>
+    Uses ASP.NET Core 8's built-in rate limiter with a fixed-window policy:
+    <strong>maximum 10 requests per IP per 15 minutes</strong> on both auth endpoints.
+    Exceeding the limit returns HTTP 429. This prevents brute-force OTP guessing attacks.
+  </p>
+</div>
+
+<!-- SECTION 4: CREDENTIAL PROVIDER DLL -->
+<div class="page">
+  <div class="page-header">
+    <span class="project">AD Password Reset – Credential Provider</span>
+    <span>Section 4 &middot; Credential Provider DLL</span>
+  </div>
+  <div class="section-label">Section 4</div>
+  <h2 class="section-title">Credential Provider DLL (C++)</h2>
+
+  <h3>What Is a Windows Credential Provider?</h3>
+  <p>
+    A <strong>Credential Provider</strong> is a COM in-process DLL that Windows loads into the
+    <strong>LogonUI.exe</strong> process to display custom authentication tiles on the login screen,
+    lock screen, and UAC prompts. Windows ships built-in credential providers for password, PIN,
+    and fingerprint. This project adds a custom one specifically for AD self-service password reset.
+  </p>
+  <p>The provider implements two COM interfaces:</p>
+  <ul>
+    <li><code>ICredentialProvider</code> — manages the tile at the screen level (field layout, tile count)</li>
+    <li><code>ICredentialProviderCredential</code> — manages a single tile's UI fields and user interactions</li>
+  </ul>
+
+  <h3>Source Files</h3>
+  <table>
+    <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>dllmain.cpp</code></td><td>DLL entry point, COM exports (DllGetClassObject, DllRegisterServer, DllUnregisterServer), registry write/delete logic</td></tr>
+      <tr><td><code>CredentialProvider.h/.cpp</code></td><td>Implements ICredentialProvider and IClassFactory — manages the tile, validates domain, creates credential object</td></tr>
+      <tr><td><code>Credential.h/.cpp</code></td><td>Implements ICredentialProviderCredential — all UI fields, button handlers, OTP flow, VPN state machine, background monitor thread</td></tr>
+      <tr><td><code>HttpClient.h</code></td><td>Header-only HTTP client using WinHTTP: IsApiReachable(), HttpPostJson(), JsonEscape(), JsonExtractString()</td></tr>
+      <tr><td><code>ResetPasswordCP.def</code></td><td>Module-definition file — explicitly exports the four required COM entry points for the linker</td></tr>
+    </tbody>
+  </table>
+
+  <h3>CLSID and COM Registration</h3>
+  <p>Every COM object has a globally unique identifier. This provider's CLSID is:</p>
+  <pre><code>{B5A84CD4-1F6A-4A52-9A11-D90E6C9D9C4A}</code></pre>
+  <p>Running <code>regsvr32 ResetPasswordCP.dll</code> calls <code>DllRegisterServer()</code>, which writes three registry entries:</p>
+  <table>
+    <thead><tr><th>Registry Key</th><th>Value</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>HKCR\CLSID\{...}</code></td><td>ResetPasswordCredentialProvider</td><td>Names the COM object</td></tr>
+      <tr><td><code>HKCR\CLSID\{...}\InprocServer32</code></td><td>Full path to DLL + ThreadingModel=Apartment</td><td>Tells Windows where to load the DLL from</td></tr>
+      <tr><td><code>HKLM\...\Authentication\Credential Providers\{...}</code></td><td>ResetPasswordCredentialProvider</td><td><strong>This is what makes the tile appear at the login screen</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Domain Guard</h3>
+  <p>
+    In <code>SetUsageScenario()</code>, the provider reads the machine's DNS domain name using
+    <code>GetComputerNameExW(ComputerNameDnsDomain)</code>. If the machine is not joined to
+    <code>viz.in</code>, it returns <code>E_NOTIMPL</code> which tells LogonUI to not show the tile.
+    If the lookup fails (e.g., offline transient error), the tile remains visible so the VPN
+    connect button is still accessible.
+  </p>
+
+  <h3>Usage Scenario Filtering</h3>
+  <p>The tile only appears in two scenarios:</p>
+  <ul>
+    <li><code>CPUS_LOGON</code> — initial login screen</li>
+    <li><code>CPUS_UNLOCK_WORKSTATION</code> — lock screen unlock</li>
+  </ul>
+  <p>It is hidden for <code>CPUS_CREDUI</code> (UAC prompts) and <code>CPUS_CHANGE_PASSWORD</code>, preventing it from appearing in inappropriate contexts.</p>
+
+  <h3>UI Field Layout</h3>
+  <p>The tile has 8 fields defined in the global array <code>g_FieldDescriptors[]</code>:</p>
+  <table>
+    <thead><tr><th>ID</th><th>Label</th><th>Type</th><th>Visible When</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>Reset AD Password</td><td><span class="field-badge">LARGE_TEXT</span></td><td>Always (both collapsed and expanded)</td></tr>
+      <tr><td>1</td><td>AD Username</td><td><span class="field-badge">EDIT_TEXT</span></td><td>Always when tile is selected; auto-focused</td></tr>
+      <tr><td>2</td><td>Send OTP</td><td><span class="field-badge">COMMAND_LINK</span></td><td>Only when network is connected</td></tr>
+      <tr><td>3</td><td>OTP Code</td><td><span class="field-badge">PASSWORD_TEXT</span></td><td>Only when network is connected</td></tr>
+      <tr><td>4</td><td>New Password</td><td><span class="field-badge">PASSWORD_TEXT</span></td><td>Only when network is connected</td></tr>
+      <tr><td>5</td><td>Status</td><td><span class="field-badge">SMALL_TEXT</span></td><td>Always; shows live status and error messages</td></tr>
+      <tr><td>6</td><td>Connect VPN</td><td><span class="field-badge">COMMAND_LINK</span></td><td>Only when there is NO network connection</td></tr>
+      <tr><td>7</td><td>Reset Password</td><td><span class="field-badge">SUBMIT_BUTTON</span></td><td>Only when network is connected</td></tr>
+    </tbody>
+  </table>
+
+  <h3>VPN State Machine</h3>
+  <p>The credential object tracks network state using a thread-safe <code>volatile LONG _state</code> variable modified via <code>InterlockedExchange()</code>:</p>
+  <div class="state-machine">
+    <div class="state-row">
+      <span class="state-badge">STATE_INIT</span>
+      <span class="state-arrow">-&gt;</span>
+      <span class="state-desc">Initial state. On tile select, immediately probe /health endpoint.</span>
+    </div>
+    <div class="state-row">
+      <span class="state-badge no-net">STATE_NO_NETWORK</span>
+      <span class="state-arrow">-&gt;</span>
+      <span class="state-desc">API unreachable. Hides OTP fields, shows "Connect VPN" button.</span>
+    </div>
+    <div class="state-row">
+      <span class="state-badge vpn">STATE_CONNECTING_VPN</span>
+      <span class="state-arrow">-&gt;</span>
+      <span class="state-desc">User clicked "Connect VPN". NEGui.exe launched. Background monitor thread started.</span>
+    </div>
+    <div class="state-row">
+      <span class="state-badge connected">STATE_CONNECTED</span>
+      <span class="state-arrow">-&gt;</span>
+      <span class="state-desc">API reachable. OTP fields shown, "Connect VPN" hidden.</span>
+    </div>
+    <div class="state-row">
+      <span class="state-badge otp">STATE_OTP_FLOW</span>
+      <span class="state-arrow">-&gt;</span>
+      <span class="state-desc">OTP sent successfully. User is filling in OTP and new password.</span>
+    </div>
+  </div>
+
+  <h3>Background Monitor Thread</h3>
+  <p>
+    When the user clicks "Connect VPN", a background thread is spawned via <code>CreateThread()</code>.
+    It polls <code>GET /health</code> every <strong>5 seconds</strong> for up to
+    <strong>20 attempts (100 seconds total)</strong>.
+  </p>
+  <p>
+    Because LogonUI runs in a single-threaded COM apartment (STA), the worker thread must use
+    <strong>COM interface marshaling</strong> to update the UI safely from a different thread:
+  </p>
+  <pre><code><span class="comment">// On the main thread — marshal events interface into a stream</span>
+CoMarshalInterThreadInterfaceInStream(
+    IID_ICredentialProviderCredentialEvents, _pEvents, &amp;pCtx-&gt;pStream);
+
+<span class="comment">// On the worker thread — unmarshal it back</span>
+CoGetInterfaceAndReleaseStream(pCtx-&gt;pStream,
+    IID_ICredentialProviderCredentialEvents, &amp;pEvents);</code></pre>
+  <p>When the VPN connects and the API becomes reachable, the thread updates field visibility directly through the marshaled interface, then exits cleanly. If VPN times out after 100 seconds, it resets state back to NO_NETWORK.</p>
+
+  <h3>HTTP Client (HttpClient.h)</h3>
+  <p>All HTTP communication uses the Windows built-in <strong>WinHTTP</strong> library. Key behaviours:</p>
+  <ul>
+    <li><strong>TLS only</strong> — <code>WINHTTP_FLAG_SECURE</code> is always set; no plain-HTTP fallback</li>
+    <li><strong>Self-signed certificate bypass</strong> — relaxes certificate validation for internal certs using <code>SECURITY_FLAG_IGNORE_UNKNOWN_CA | SECURITY_FLAG_IGNORE_CERT_CN_INVALID | SECURITY_FLAG_IGNORE_CERT_DATE_INVALID</code></li>
+    <li><strong>Short timeouts</strong> — /health uses 2-second timeouts; API calls use 5-second timeouts to prevent login screen freezing</li>
+    <li><strong>JSON escaping</strong> — <code>JsonEscape()</code> properly escapes quotes, backslashes, newlines in user input before sending</li>
+    <li><strong>JSON parsing</strong> — lightweight <code>JsonExtractString()</code> reads error messages from server JSON responses without any JSON library dependency</li>
+  </ul>
+
+  <h3>Secure Memory Handling</h3>
+  <p>
+    Sensitive strings (OTP code, new password) are cleared from memory using
+    <code>SecureZeroMemory()</code> immediately after use. This prevents sensitive data
+    from lingering in process memory pages where it could be read by other processes or appear
+    in memory dumps.
+  </p>
+</div>
+
+<!-- SECTION 5: HOW IT WAS BUILT -->
+<div class="page">
+  <div class="page-header">
+    <span class="project">AD Password Reset – Credential Provider</span>
+    <span>Section 5 &middot; How It Was Built</span>
+  </div>
+  <div class="section-label">Section 5</div>
+  <h2 class="section-title">How It Was Built — Step-by-Step</h2>
+
+  <h3>Prerequisites and Tools</h3>
+  <table>
+    <thead><tr><th>Tool</th><th>Purpose</th><th>Where to Get</th></tr></thead>
+    <tbody>
+      <tr><td>Visual Studio 2022</td><td>Build the C++ DLL project</td><td>visualstudio.microsoft.com</td></tr>
+      <tr><td>Windows SDK (10 or 11)</td><td>Headers for ICredentialProvider, WinHTTP, COM</td><td>Included with Visual Studio 2022</td></tr>
+      <tr><td>.NET 8 SDK</td><td>Build the ASP.NET Core backend</td><td>dot.net/download</td></tr>
+      <tr><td>Active Directory</td><td>Domain controller for testing (viz.in)</td><td>Windows Server AD DS role</td></tr>
+      <tr><td>PFX Certificate</td><td>TLS certificate for the API server</td><td>Self-signed (see Step 4) or from AD CS</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Step 1 — Create the Visual Studio C++ DLL Project</h3>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">1</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>New Project: DLL (Dynamic Link Library)</strong>
+        <p>In Visual Studio: File &rarr; New &rarr; Project &rarr; "Dynamic-Link Library (DLL)" C++. Name it ResetPasswordCP.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">2</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Configure project properties</strong>
+        <p>Configuration Properties &rarr; General &rarr; Target Name: ResetPasswordCP. Set Character Set to Unicode. Set Platform to x64.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">3</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Add Module Definition File</strong>
+        <p>Add ResetPasswordCP.def to the project. In Linker &rarr; Input &rarr; Module Definition File, enter ResetPasswordCP.def. This explicitly exports the four COM entry points.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">4</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Add linker dependencies</strong>
+        <p>Linker &rarr; Input &rarr; Additional Dependencies: add winhttp.lib, shell32.lib, ole32.lib.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">5</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Write the five source files</strong>
+        <p>Create dllmain.cpp, CredentialProvider.h, CredentialProvider.cpp, Credential.h, Credential.cpp, and HttpClient.h as described in Section 4.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">6</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Build in Release x64</strong>
+        <p>Select Release | x64 in the toolbar. Build &rarr; Build Solution. Output: x64\Release\ResetPasswordCP.dll</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Step 2 — Understanding the COM Interface Chain</h3>
+  <p>A Credential Provider requires implementing a chain of COM interfaces in a specific order:</p>
+  <pre><code><span class="comment">// 1. Windows calls DllGetClassObject() to get a factory object</span>
+CCredentialProviderFactory : public IClassFactory
+    CreateInstance() creates a CCredentialProvider
+
+<span class="comment">// 2. Windows calls SetUsageScenario() to decide if the tile should appear</span>
+CCredentialProvider : public ICredentialProvider
+    GetFieldDescriptorCount/At() -- describes the UI field layout
+    GetCredentialCount/At()      -- tells Windows there is 1 tile
+
+<span class="comment">// 3. Windows calls methods on the credential object for UI interactions</span>
+CCredential : public ICredentialProviderCredential
+    GetFieldState()      -- which fields are currently visible
+    GetStringValue()     -- get text content of a field
+    SetStringValue()     -- user typed in a field (username, OTP, password)
+    CommandLinkClicked() -- user clicked Send OTP or Connect VPN
+    GetSerialization()   -- user clicked the Submit (Reset Password) button</code></pre>
+
+  <h3>Step 3 — Create the ASP.NET Core Backend</h3>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">1</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Create the project</strong>
+        <p><code>dotnet new web -n ResetPasswordAPI</code> (uses the Minimal API template)</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">2</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Add NuGet packages</strong>
+        <p><code>dotnet add package Microsoft.Extensions.Hosting.WindowsServices</code> (run as Windows Service)<br>
+        <code>dotnet add package System.DirectoryServices.Protocols</code> (LDAP communication)</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">3</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Configure Kestrel for HTTPS on port 8443</strong>
+        <p>Load PFX certificate path and password from .env file. App refuses to start if PFX is missing.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">4</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Add rate limiter and Windows Service support</strong>
+        <p>Call builder.Host.UseWindowsService() and builder.Services.AddRateLimiter() before building the app.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">5</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Implement the three routes</strong>
+        <p>app.MapGet("/health"), app.MapPost("/api/auth/request-otp"), app.MapPost("/api/auth/reset-password").</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">6</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Publish as self-contained executable</strong>
+        <p><code>dotnet publish -c Release -r win-x64 --self-contained true -o publish\</code></p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Step 4 — Generate a Self-Signed TLS Certificate</h3>
+  <p>Run on the server (172.16.10.4) in PowerShell as Administrator:</p>
+  <pre><code><span class="comment"># Create a self-signed certificate valid for 10 years</span>
+$cert = New-SelfSignedCertificate `
+    -DnsName "172.16.10.4" `
+    -CertStoreLocation "cert:\LocalMachine\My" `
+    -NotAfter (Get-Date).AddYears(10)
+
+<span class="comment"># Export as PFX</span>
+$pwd = ConvertTo-SecureString -String "YourPfxPassword" -Force -AsPlainText
+Export-PfxCertificate `
+    -Cert "cert:\LocalMachine\My\$($cert.Thumbprint)" `
+    -FilePath "C:\ResetPasswordAPI\server.pfx" `
+    -Password $pwd</code></pre>
+
+  <div class="info-box">
+    <div class="info-box-title">Why Self-Signed?</div>
+    Since the backend is only accessed by the credential provider DLL (not a browser), and
+    the DLL already bypasses certificate validation for internal certs, a self-signed certificate
+    is sufficient for this internal deployment. For production hardening, use a certificate
+    from Active Directory Certificate Services instead.
+  </div>
+</div>
+
+<!-- SECTION 6: CONFIGURATION -->
+<div class="page">
+  <div class="page-header">
+    <span class="project">AD Password Reset – Credential Provider</span>
+    <span>Section 6 &middot; Configuration Reference</span>
+  </div>
+  <div class="section-label">Section 6</div>
+  <h2 class="section-title">Configuration Reference</h2>
+
+  <p>
+    The backend reads all configuration from a <code>.env</code> file placed in the same folder
+    as <code>ResetPasswordAPI.exe</code>. Lines starting with <code>#</code> are comments.
+    Missing keys fall back to built-in defaults where available.
+  </p>
+
+  <h3>Sample .env File</h3>
+  <pre><code><span class="comment"># ── Server ────────────────────────────────────────</span>
+PORT=8443
+TLS_PFX_PATH=C:\ResetPasswordAPI\server.pfx
+TLS_PFX_PASSWORD=YourPfxPassword
+
+<span class="comment"># ── Active Directory ──────────────────────────────</span>
+AD_URL=ldaps://172.16.10.4:636
+AD_BASE_DN=DC=viz,DC=in
+AD_BIND_DN=CN=svc-pwdreset,OU=ServiceAccounts,DC=viz,DC=in
+AD_BIND_PASSWORD=ServiceAccountPassword
+
+<span class="comment"># ── SMTP / Email ──────────────────────────────────</span>
+SMTP_HOST=smtp.office365.com
+SMTP_PORT=587
+SMTP_USER=it-support@viz.in
+SMTP_PASSWORD=EmailPassword
+
+<span class="comment"># ── OTP settings ─────────────────────────────────</span>
+OTP_TTL_SECONDS=300
+
+<span class="comment"># ── Rate limiting ─────────────────────────────────</span>
+RATE_LIMIT_MAX=10</code></pre>
+
+  <h3>All Configuration Variables</h3>
+  <table>
+    <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>PORT</code></td><td>8443</td><td>HTTPS port the API listens on</td></tr>
+      <tr><td><code>TLS_PFX_PATH</code></td><td><em>required</em></td><td>Full path to the PFX certificate file. App will not start without a valid path.</td></tr>
+      <tr><td><code>TLS_PFX_PASSWORD</code></td><td>(empty)</td><td>Password for the PFX file</td></tr>
+      <tr><td><code>AD_URL</code></td><td>ldaps://172.16.10.4:636</td><td>LDAP URL for Active Directory. Must use LDAPS for password resets.</td></tr>
+      <tr><td><code>AD_BASE_DN</code></td><td>DC=viz,DC=in</td><td>LDAP search base — the root DN where users are searched</td></tr>
+      <tr><td><code>AD_BIND_DN</code></td><td><em>required</em></td><td>Distinguished Name of the service account used to connect to AD</td></tr>
+      <tr><td><code>AD_BIND_PASSWORD</code></td><td><em>required</em></td><td>Password of the service account</td></tr>
+      <tr><td><code>SMTP_HOST</code></td><td><em>required</em></td><td>SMTP server hostname</td></tr>
+      <tr><td><code>SMTP_PORT</code></td><td>587</td><td>SMTP port (587 for STARTTLS, 465 for implicit SSL)</td></tr>
+      <tr><td><code>SMTP_USER</code></td><td><em>required</em></td><td>Email address used as the sender and for SMTP authentication</td></tr>
+      <tr><td><code>SMTP_PASSWORD</code></td><td><em>required</em></td><td>SMTP authentication password</td></tr>
+      <tr><td><code>OTP_TTL_SECONDS</code></td><td>300</td><td>How long (seconds) an OTP is valid after generation. Default is 5 minutes.</td></tr>
+      <tr><td><code>RATE_LIMIT_MAX</code></td><td>10</td><td>Maximum auth requests allowed per source IP per 15-minute window</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-box warning">
+    <div class="info-box-title">Service Account Permissions Required</div>
+    The <code>AD_BIND_DN</code> service account needs these specific AD delegated permissions:
+    <ul style="margin-top:6px">
+      <li><strong>Read</strong> on user objects — to look up the mail and displayName attributes</li>
+      <li><strong>Reset Password</strong> on user objects — to write the unicodePwd attribute</li>
+    </ul>
+    Do <strong>not</strong> use a Domain Admin account. Create a dedicated service account with least-privilege delegation only.
+  </div>
+</div>
+
+<!-- SECTION 7: DEPLOYMENT -->
+<div class="page">
+  <div class="page-header">
+    <span class="project">AD Password Reset – Credential Provider</span>
+    <span>Section 7 &middot; Deployment Guide</span>
+  </div>
+  <div class="section-label">Section 7</div>
+  <h2 class="section-title">Deployment Guide</h2>
+
+  <h3>Part A — Deploy the Backend API as a Windows Service</h3>
+  <p>Run these commands on the server (172.16.10.4) in PowerShell as Administrator:</p>
+
+  <h4>1. Create the service folder</h4>
+  <pre><code>New-Item -Path "C:\ResetPasswordAPI" -ItemType Directory -Force</code></pre>
+
+  <h4>2. Copy the published files to the server</h4>
+  <pre><code><span class="comment"># From dev machine — copy the publish folder</span>
+Copy-Item "d:\reset password\publish\*" `
+    -Destination "\\172.16.10.4\C$\ResetPasswordAPI\" -Recurse -Force
+
+<span class="comment"># Copy the .env configuration file</span>
+Copy-Item "C:\path\to\.env" -Destination "\\172.16.10.4\C$\ResetPasswordAPI\.env"</code></pre>
+
+  <h4>3. Open firewall port 8443</h4>
+  <pre><code>New-NetFirewallRule `
+    -DisplayName "Reset Password API" `
+    -Direction Inbound -Protocol TCP `
+    -LocalPort 8443 -Action Allow</code></pre>
+
+  <h4>4. Register and start as Windows Service</h4>
+  <pre><code>New-Service `
+    -Name "ResetPasswordAPI" `
+    -BinaryPathName "C:\ResetPasswordAPI\ResetPasswordAPI.exe" `
+    -DisplayName "AD Password Reset API" `
+    -StartupType Automatic
+
+Start-Service -Name "ResetPasswordAPI"
+Get-Service  -Name "ResetPasswordAPI"</code></pre>
+
+  <h4>5. Verify it is working</h4>
+  <pre><code><span class="comment"># Should return: { "status": "ok", "time": "..." }</span>
+Invoke-RestMethod -Uri "https://172.16.10.4:8443/health" -SkipCertificateCheck</code></pre>
+
+  <div class="info-box success">
+    <div class="info-box-title">Service Running Successfully</div>
+    If you see <code>{ "status": "ok" }</code>, the backend is correctly deployed and listening on port 8443.
+  </div>
+
+  <h3>Part B — Deploy the Credential Provider via Group Policy</h3>
+  <p>The DLL must be copied to <code>C:\Windows\System32\</code> and registered on every domain machine.
+  A GPO startup script handles this automatically on every domain PC.</p>
+
+  <h4>Step 1 — Create network share on server</h4>
+  <pre><code>New-Item -Path "C:\IT-Deploy" -ItemType Directory -Force
+
+New-SmbShare -Name "IT-Deploy" -Path "C:\IT-Deploy" `
+    -ReadAccess "Domain Computers" -FullAccess "Domain Admins"
+
+$acl  = Get-Acl "C:\IT-Deploy"
+$rule = New-Object System.Security.AccessControl.FileSystemAccessRule(
+    "Domain Computers","Read","ContainerInherit,ObjectInherit","None","Allow")
+$acl.AddAccessRule($rule)
+Set-Acl "C:\IT-Deploy" $acl</code></pre>
+
+  <h4>Step 2 — Copy DLL to the share (from dev machine)</h4>
+  <pre><code>net use \\172.16.10.4\IT-Deploy /user:VIZPAY\Administrator *
+
+Copy-Item "d:\reset password\x64\Release\ResetPasswordCP.dll" `
+    -Destination "\\172.16.10.4\IT-Deploy\" -Force</code></pre>
+
+  <h4>Step 3 — Create GPO startup script and link to domain</h4>
+  <pre><code><span class="comment"># Create the deploy batch script (idempotent — skips if already installed)</span>
+@'
+@echo off
+set DLL_SOURCE=\\172.16.10.4\IT-Deploy\ResetPasswordCP.dll
+set DLL_DEST=%SystemRoot%\System32\ResetPasswordCP.dll
+set REG_KEY=HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers\{B5A84CD4-1F6A-4A52-9A11-D90E6C9D9C4A}
+reg query "%REG_KEY%" >nul 2>&1
+if %errorlevel% == 0 exit /b 0
+copy /y "%DLL_SOURCE%" "%DLL_DEST%" >nul 2>&1
+regsvr32 /s "%DLL_DEST%"
+'@ | Out-File "C:\IT-Deploy\deploy_resetcp.bat" -Encoding ASCII
+
+<span class="comment"># Create GPO and link to entire domain</span>
+Import-Module GroupPolicy
+$gpo  = New-GPO -Name "Deploy-ResetPasswordCP"
+$dn   = (Get-ADDomain).DistinguishedName
+New-GPLink -Name "Deploy-ResetPasswordCP" -Target $dn
+
+<span class="comment"># Copy script to GPO SYSVOL Startup folder</span>
+$dns  = (Get-ADDomain).DNSRoot
+$guid = "{$($gpo.Id.ToString().ToUpper())}"
+$dir  = "\\$dns\SYSVOL\$dns\Policies\$guid\Machine\Scripts\Startup"
+New-Item -Path $dir -ItemType Directory -Force
+Copy-Item "C:\IT-Deploy\deploy_resetcp.bat" -Destination $dir -Force
+
+<span class="comment"># Register script in GPO scripts.ini</span>
+@"
+[Startup]
+0CmdLine=deploy_resetcp.bat
+0Parameters=
+"@ | Out-File "\\$dns\SYSVOL\$dns\Policies\$guid\Machine\Scripts\scripts.ini" -Encoding Unicode</code></pre>
+
+  <h4>Step 4 — Test on a client machine</h4>
+  <pre><code>gpupdate /force
+<span class="comment"># Then reboot — the "Reset AD Password" tile should appear on the login screen</span></code></pre>
+</div>
+
+<!-- SECTION 8: USER FLOW -->
+<div class="page">
+  <div class="page-header">
+    <span class="project">AD Password Reset – Credential Provider</span>
+    <span>Section 8 &middot; End-User Flow</span>
+  </div>
+  <div class="section-label">Section 8</div>
+  <h2 class="section-title">End-User Flow</h2>
+
+  <h3>Scenario A — User is on the Corporate Network (or VPN already connected)</h3>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">1</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Open the lock screen or login screen</strong>
+        <p>User sees standard login options plus the "Reset AD Password" tile.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">2</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Click the tile</strong>
+        <p>Status briefly shows "Checking network…". Since the backend is reachable, the OTP form fields appear. Username field is auto-focused.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">3</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Enter AD Username then click "Send OTP"</strong>
+        <p>Status shows "Sending OTP…". Backend verifies the user exists in AD and sends a 6-digit code to their AD-registered email.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">4</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Check email on phone or another device</strong>
+        <p>Receives an email from IT Support containing the 6-digit OTP and a notice that it expires in 5 minutes.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">5</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Enter OTP + New Password then click "Reset Password"</strong>
+        <p>Status shows "Resetting password…". Backend verifies OTP and resets the unicodePwd attribute in Active Directory.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">6</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Log in immediately with new password</strong>
+        <p>Status shows "Password reset successful. You may now log in." User switches to the password tile and logs in with new credentials.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Scenario B — User is Off-Network (No VPN)</h3>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">1</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Click the "Reset AD Password" tile</strong>
+        <p>Health check fails. Status: "Not connected. Click 'Connect VPN' to launch the VPN client." OTP fields are hidden; only "Connect VPN" button shows.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">2</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Click "Connect VPN"</strong>
+        <p>SonicWall NetExtender (NEGui.exe) launches from Program Files. Status: "NetExtender opened. Connect VPN then return here." A background thread begins polling /health every 5 seconds.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">3</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Connect VPN in the NetExtender window</strong>
+        <p>Status updates in real time: "Waiting for VPN… (attempt X of 20)". No action needed on the tile.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">4</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>VPN connects — tile updates automatically</strong>
+        <p>Background thread detects API is reachable. OTP fields appear automatically. Status: "VPN connected. Enter your AD username and click Send OTP."</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-left"><div class="flow-circle">5</div><div class="flow-line"></div></div>
+      <div class="flow-content">
+        <strong>Continue from Scenario A, Step 3</strong>
+        <p>Identical to the on-network flow from this point forward.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Error Messages the User Might See</h3>
+  <table>
+    <thead><tr><th>Message</th><th>Cause</th><th>What to Do</th></tr></thead>
+    <tbody>
+      <tr><td>Enter AD username first</td><td>Clicked Send OTP with empty username</td><td>Type your domain username (e.g., john.doe)</td></tr>
+      <tr><td>User not found or account disabled</td><td>Username not in AD or account disabled</td><td>Verify username; contact IT if account is disabled</td></tr>
+      <tr><td>Invalid or expired OTP</td><td>Wrong code or waited more than 5 minutes</td><td>Click Send OTP again to request a fresh code</td></tr>
+      <tr><td>Password does not meet requirements</td><td>New password violates AD complexity policy</td><td>Use 12+ characters with uppercase, lowercase, numbers, and symbols</td></tr>
+      <tr><td>Could not launch VPN client</td><td>NetExtender not installed at expected path</td><td>Install SonicWall NetExtender</td></tr>
+      <tr><td>VPN timed out</td><td>VPN not connected within 100 seconds</td><td>Click Connect VPN again to retry</td></tr>
+      <tr><td>All fields are required</td><td>Submit clicked with empty fields</td><td>Fill in username, OTP, and new password</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- SECTION 9: SECURITY -->
+<div class="page">
+  <div class="page-header">
+    <span class="project">AD Password Reset – Credential Provider</span>
+    <span>Section 9 &middot; Security Design</span>
+  </div>
+  <div class="section-label">Section 9</div>
+  <h2 class="section-title">Security Design</h2>
+
+  <table>
+    <thead><tr><th>Security Control</th><th>How It Is Implemented</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>HTTPS Only</strong></td>
+        <td>The backend uses Kestrel with TLS via PFX certificate. The DLL always sets WINHTTP_FLAG_SECURE. There is no plain HTTP fallback.</td>
+      </tr>
+      <tr>
+        <td><strong>OTP Identity Verification</strong></td>
+        <td>Password reset requires proof of email access. Without the OTP delivered to the AD-registered email, an attacker cannot reset a password even if they know the username.</td>
+      </tr>
+      <tr>
+        <td><strong>One-Time OTP</strong></td>
+        <td>Each OTP is deleted from the store immediately on first use. Replay attacks are not possible.</td>
+      </tr>
+      <tr>
+        <td><strong>OTP Expiry</strong></td>
+        <td>OTPs expire after 5 minutes (configurable). The short window limits exposure if an email is intercepted.</td>
+      </tr>
+      <tr>
+        <td><strong>Rate Limiting</strong></td>
+        <td>Maximum 10 OTP requests per source IP per 15 minutes. This prevents brute-force enumeration of usernames or OTP codes.</td>
+      </tr>
+      <tr>
+        <td><strong>LDAP Injection Prevention</strong></td>
+        <td>LdapEscape() in Program.cs escapes all special LDAP characters (backslash, asterisk, parentheses, null bytes) before constructing LDAP filter strings.</td>
+      </tr>
+      <tr>
+        <td><strong>JSON Injection Prevention</strong></td>
+        <td>JsonEscape() in the DLL escapes all special JSON characters before embedding user input into the HTTP request body.</td>
+      </tr>
+      <tr>
+        <td><strong>Disabled Account Exclusion</strong></td>
+        <td>The LDAP filter includes a userAccountControl bit-mask check to ensure disabled accounts cannot receive OTPs or have their password reset.</td>
+      </tr>
+      <tr>
+        <td><strong>Secure Memory Clearing</strong></td>
+        <td>SecureZeroMemory() is called on password and OTP string buffers in the DLL immediately after use, preventing sensitive data from lingering in memory dumps.</td>
+      </tr>
+      <tr>
+        <td><strong>Domain-Restricted Tile</strong></td>
+        <td>The tile only appears on machines joined to the viz.in domain. Machines on other domains or workgroups do not see the tile.</td>
+      </tr>
+      <tr>
+        <td><strong>Least Privilege Service Account</strong></td>
+        <td>The LDAP bind account should have only Read and Reset Password delegated permissions — not Domain Admin or full AD write access.</td>
+      </tr>
+      <tr>
+        <td><strong>LDAP over SSL (LDAPS)</strong></td>
+        <td>All LDAP communication uses port 636 with SSL. AD requires LDAPS for unicodePwd modifications — plain LDAP rejects them outright.</td>
+      </tr>
+      <tr>
+        <td><strong>Short HTTP Timeouts</strong></td>
+        <td>Health check uses 2-second timeouts; API calls use 5-second timeouts. This prevents the Windows login screen from freezing if the server is unreachable.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="info-box warning">
+    <div class="info-box-title">Known Limitation: Self-Signed Certificate</div>
+    The DLL bypasses TLS certificate validation to support internal self-signed certificates.
+    For production hardening, issue a certificate from Active Directory Certificate Services
+    and remove the SECURITY_FLAG_IGNORE_UNKNOWN_CA bypass flags from HttpClient.h.
+  </div>
+
+  <div class="info-box warning">
+    <div class="info-box-title">Known Limitation: In-Memory OTP Store</div>
+    OTPs are stored in process memory only. If the service restarts, all pending OTPs are lost and
+    users must request a new code. For a high-availability environment, consider persisting OTPs
+    to a database with TTL expiry.
+  </div>
+</div>
+
+<!-- SECTION 10: TROUBLESHOOTING -->
+<div class="page">
+  <div class="page-header">
+    <span class="project">AD Password Reset – Credential Provider</span>
+    <span>Section 10 &middot; Troubleshooting</span>
+  </div>
+  <div class="section-label">Section 10</div>
+  <h2 class="section-title">Troubleshooting</h2>
+
+  <h3>Credential Provider DLL Issues</h3>
+  <table>
+    <thead><tr><th>Problem</th><th>Cause</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Tile does not appear on login screen</td>
+        <td>DLL not registered, wrong domain, or wrong platform (32-bit vs 64-bit)</td>
+        <td>Run <code>regsvr32 C:\Windows\System32\ResetPasswordCP.dll</code> as Administrator. Verify machine is joined to viz.in domain. Confirm the Credential Providers registry key exists. Reboot.</td>
+      </tr>
+      <tr>
+        <td>Tile shows but immediately says "Not connected"</td>
+        <td>Backend not running or firewall blocks port 8443</td>
+        <td>Start the ResetPasswordAPI service. Run <code>Test-NetConnection 172.16.10.4 -Port 8443</code>. Check firewall rule exists.</td>
+      </tr>
+      <tr>
+        <td>regsvr32 fails with "access denied"</td>
+        <td>Not running as Administrator</td>
+        <td>Right-click PowerShell and choose "Run as Administrator" before running regsvr32.</td>
+      </tr>
+      <tr>
+        <td>GPO script does not run on new machines</td>
+        <td>GPO not yet applied</td>
+        <td>Run <code>gpupdate /force</code> and reboot. Check GPO is linked and enabled in Group Policy Management Console.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Backend API Issues</h3>
+  <table>
+    <thead><tr><th>Problem</th><th>Cause</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Service fails to start</td>
+        <td>Missing or invalid PFX file</td>
+        <td>Check TLS_PFX_PATH in .env points to an existing PFX. Check the password. Check Windows Event Log: Application source ResetPasswordAPI.</td>
+      </tr>
+      <tr>
+        <td>"Failed to contact directory server"</td>
+        <td>LDAP connection to AD fails</td>
+        <td>Run <code>Test-NetConnection 172.16.10.4 -Port 636</code>. Verify AD_BIND_DN and AD_BIND_PASSWORD are correct.</td>
+      </tr>
+      <tr>
+        <td>"Could not send OTP email"</td>
+        <td>SMTP settings wrong or server unreachable</td>
+        <td>Verify SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD. Test SMTP connectivity from the server.</td>
+      </tr>
+      <tr>
+        <td>"Password does not meet domain complexity requirements"</td>
+        <td>AD password policy rejected the new password</td>
+        <td>Use a longer password meeting your domain's complexity rules. The API requires a minimum of 12 characters.</td>
+      </tr>
+      <tr>
+        <td>OTP emails not arriving</td>
+        <td>User has no mail attribute in AD, or email in spam</td>
+        <td>Check the user's mail attribute is populated in Active Directory Users and Computers. Check the spam/junk folder.</td>
+      </tr>
+      <tr>
+        <td>429 Too Many Requests</td>
+        <td>Rate limit exceeded</td>
+        <td>Wait 15 minutes. For testing, restart the service to reset the rate limiter state.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Diagnostic Commands</h3>
+  <pre><code><span class="comment"># Check if credential provider is registered</span>
+Get-Item "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers\{B5A84CD4-1F6A-4A52-9A11-D90E6C9D9C4A}"
+
+<span class="comment"># Check backend service status</span>
+Get-Service -Name "ResetPasswordAPI"
+
+<span class="comment"># View backend service logs (Windows Event Log)</span>
+Get-EventLog -LogName Application -Source "ResetPasswordAPI" -Newest 20
+
+<span class="comment"># Test API health</span>
+Invoke-RestMethod -Uri "https://172.16.10.4:8443/health" -SkipCertificateCheck
+
+<span class="comment"># Test LDAP port</span>
+Test-NetConnection -ComputerName 172.16.10.4 -Port 636
+
+<span class="comment"># Test API port</span>
+Test-NetConnection -ComputerName 172.16.10.4 -Port 8443
+
+<span class="comment"># Unregister the DLL (removes the tile)</span>
+regsvr32 /u "C:\Windows\System32\ResetPasswordCP.dll"
+
+<span class="comment"># Force GPO update on client machine</span>
+gpupdate /force</code></pre>
+
+  <div class="info-box">
+    <div class="info-box-title">Event Log Location</div>
+    The backend API logs to Windows Event Log under: <strong>Windows Logs &rarr; Application</strong>,
+    Source: <strong>ResetPasswordAPI</strong>. All OTP requests, successful resets, and errors are logged there with timestamps.
+  </div>
+</div>
+
+</body>
+</html>
